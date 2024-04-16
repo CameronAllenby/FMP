@@ -1,0 +1,54 @@
+{
+    "name": "Input Actions",
+    "maps": [
+        {
+            "name": "New action map",
+            "id": "d6c38f02-ddfb-4667-afea-1e4857659be3",
+            "actions": [
+                {
+                    "name": "New action",
+                    "type": "Value",
+                    "id": "e6915aff-3aeb-4bbb-8b16-4d0b2c6c6c67",
+                    "expectedControlType": "Stick",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Camera",
+                    "type": "Value",
+                    "id": "4dfd5f98-3b2f-4a98-9745-454ac3825a7e",
+                    "expectedControlType": "Stick",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "4470acc4-4d64-4080-afd1-b445e8f2aca8",
+                    "path": "<Gamepad>/leftStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "New action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b7d8ee20-027d-4095-8aab-ed6bbd148fe4",
+                    "path": "<Gamepad>/rightStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Camera",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
