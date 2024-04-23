@@ -4,6 +4,7 @@ using UnityEngine;
 using Cinemachine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
+using Unity.VisualScripting;
 
 public enum States
 {
@@ -17,22 +18,34 @@ public enum States
 }
 public class PlayerControles : MonoBehaviour
 {
-    [SerializeField] private Rigidbody rb;
     [SerializeField] private float speed;
+    public CharacterController controller;
     private Vector2 moveInputValue;
     private Vector2 cameraInputValue;
     private float yRot;
     public float mouseSensitivity = 1f;
     private Animator anim;
-
+    private bool jump;
     States state;
+    Vector3 velocity;
+    public float gravity = -9.81f;
+    void Update()
+    {
+        DoLogic();
+        velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * Time.deltaTime);
+    }
+
+    void FixedUpdate()
+    {
+        grounded = false;
+    }
 
     bool grounded;
 
     private void Start()
     {
         anim = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody>();
         state = States.Idle;
     }
     void DoLogic()
@@ -60,15 +73,14 @@ public class PlayerControles : MonoBehaviour
 
     void PlayerIdle()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (grounded == false)
         {
-            // simulate jump
-            state = States.Jump;
-            rb.velocity = new Vector3(0, 100, 0);
+           
         }
 
         anim.SetBool("walk", false);
-        if (Input.GetAxis("Mouse X") != 0f)
+
+        if (moveInputValue.x != 0f || moveInputValue.y != 0f)
         {
             state = States.Walk;
         }
@@ -76,28 +88,45 @@ public class PlayerControles : MonoBehaviour
 
     void PlayerJumping()
     {
+        if (grounded == false)
+        {
+            anim.SetBool("Fall", true);
+            anim.SetBool("jump", false);
+
+        }
         // player is jumping, check for hitting the ground
         if (grounded == true)
         {
-            //player has landed on floor
+            Jcount = 1;
             state = States.Idle;
         }
     }
-
     void PlayerWalk()
     {
+        anim.SetBool("walk", true);
         transform.Translate(moveInputValue.x * speed * Time.fixedDeltaTime, 0, moveInputValue.y * speed * Time.fixedDeltaTime);
         yRot += Input.GetAxis("Mouse X") * mouseSensitivity;
-        if (rb.velocity.z != 0)
-        {
-            transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, yRot, transform.localEulerAngles.z);
-        }
-        if (moveInputValue.x == 0f && moveInputValue.y == 0f)
+        transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, yRot, transform.localEulerAngles.z);
+        if (moveInputValue.x <= 0.1f && moveInputValue.y <= 0.1f)
         {
             state = States.Idle;
         }
     }
+    int Jcount = 1;
+    void OnJump()
+    {
+        anim.SetBool("walk", false);
+        transform.Translate(moveInputValue.x * speed * Time.fixedDeltaTime, 0, moveInputValue.y * speed * Time.fixedDeltaTime);
+        // simulate jump
+        state = States.Jump;
+        Debug.Log("Pressed");
+        if (Jcount >= 0)
+        {
 
+            Jcount--;
+
+        }
+    }
     void PlayerDeath()
     {
 
@@ -129,7 +158,7 @@ public class PlayerControles : MonoBehaviour
     private void OnGUI()
     {
         //debug text
-        string text = "Left/Right arrows = Rotate\nSpace = Jump\nUp Arrow = Forward\nCurrent state=" + state;
+        string text = "Current state=" + state;
 
         // define debug text area
         GUILayout.BeginArea(new Rect(10f, 450f, 1600f, 1600f));

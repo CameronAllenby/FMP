@@ -324,7 +324,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ee27335fc971b404e94b65dc4b6bb357, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.0000018067658
+      value: 5.64
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ee27335fc971b404e94b65dc4b6bb357, type: 3}
       propertyPath: m_LocalPosition.z
@@ -377,7 +377,10 @@ PrefabInstance:
       addedObject: {fileID: 1853679269}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ee27335fc971b404e94b65dc4b6bb357, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1853679268}
+      addedObject: {fileID: 1853679270}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ee27335fc971b404e94b65dc4b6bb357, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1853679271}
   m_SourcePrefab: {fileID: 100100000, guid: ee27335fc971b404e94b65dc4b6bb357, type: 3}
 --- !u!1 &937175280
 GameObject:
@@ -592,8 +595,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.22903095, y: 0.7707879, z: -0.4107507, w: 0.4297845}
-  m_LocalPosition: {x: 407.64816, y: 15.000002, z: 375.28293}
+  m_LocalRotation: {x: 0.22903097, y: 0.7707879, z: -0.41075066, w: 0.42978457}
+  m_LocalPosition: {x: 407.64816, y: 20.64, z: 375.28293}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -646,7 +649,7 @@ GameObject:
   - component: {fileID: 1076596101}
   m_Layer: 0
   m_Name: Terrain
-  m_TagString: Untagged
+  m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -797,7 +800,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1741471799}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.2132679, y: 0.78519976, z: -0.38248068, w: 0.43782052}
+  m_LocalRotation: {x: 0.21326786, y: 0.7851997, z: -0.3824807, w: 0.43782046}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -867,33 +870,6 @@ MonoBehaviour:
   m_DefaultActionMap: New action map
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!54 &1853679268
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1853679264}
-  serializedVersion: 4
-  m_Mass: 10
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!114 &1853679269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -906,9 +882,59 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7968a946fcb14aa4ba363e0e2c661558, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 1853679268}
-  speed: 10
-  mouseSensitivity: 5
+  speed: 2
+  controller: {fileID: 1853679271}
+  mouseSensitivity: 1
+  gravity: -9.81
+--- !u!136 &1853679270
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1853679264}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.019051665
+  m_Height: 0.09588525
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.044164196, z: 0.0037815857}
+--- !u!143 &1853679271
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1853679264}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1894229751
 GameObject:
   m_ObjectHideFlags: 3
@@ -980,7 +1006,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1894229751}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.22903094, y: 0.77078795, z: -0.41075066, w: 0.42978457}
+  m_LocalRotation: {x: 0.22903095, y: 0.7707879, z: -0.41075063, w: 0.42978457}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1198,7 +1224,7 @@ MonoBehaviour:
   m_XAxis:
     Value: 0
     m_SpeedMode: 0
-    m_MaxSpeed: 100
+    m_MaxSpeed: 200
     m_AccelTime: 0.1
     m_DecelTime: 0.1
     m_InputAxisName: Mouse X
@@ -1246,7 +1272,7 @@ Transform:
   m_GameObject: {fileID: 1900490004}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 407.64816, y: 15.000002, z: 375.28293}
+  m_LocalPosition: {x: 407.64816, y: 20.64, z: 375.28293}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
