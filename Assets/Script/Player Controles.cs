@@ -15,6 +15,8 @@ public enum States
     Death,
     Glide,
     Aim,
+    Sprint,
+    Fall,
 }
 public class PlayerControles : MonoBehaviour
 {
@@ -28,20 +30,34 @@ public class PlayerControles : MonoBehaviour
     private bool jump;
     States state;
     Vector3 velocity;
-    public float gravity = -9.81f;
+    public float gravity = -0.81f;
+    public float jumpHight = 9f;
+
+    public Transform groundCheck;
+    public float groundDistance = 0.4f;
+    public LayerMask groundMask;
+    bool isGrounded;
+
+    bool isSprint;
+    int Sprint = 0;
     void Update()
     {
-        DoLogic();
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+
+        if (isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2;
+        }
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        DoLogic();
     }
 
     void FixedUpdate()
     {
-        grounded = false;
+ 
     }
-
-    bool grounded;
 
     private void Start()
     {
@@ -69,16 +85,26 @@ public class PlayerControles : MonoBehaviour
         {
             PlayerDeath();
         }
+
+        if (state == States.Sprint)
+        {
+            PlayerSprint();
+        }
+
+        if (state == States.Fall)
+        {
+            PlayerFall();
+        }
     }
 
     void PlayerIdle()
     {
-        if (grounded == false)
+        if (isGrounded == false)
         {
-           
+            
         }
-
-        anim.SetBool("walk", false);
+        anim.SetBool("Running", false);
+        anim.SetBool("Walk", false);
 
         if (moveInputValue.x != 0f || moveInputValue.y != 0f)
         {
@@ -88,22 +114,27 @@ public class PlayerControles : MonoBehaviour
 
     void PlayerJumping()
     {
-        if (grounded == false)
+        if (isGrounded == false)
         {
             anim.SetBool("Fall", true);
-            anim.SetBool("jump", false);
-
+            anim.SetBool("Jump", false);
+            state = States.Fall;
         }
         // player is jumping, check for hitting the ground
-        if (grounded == true)
+        if (isGrounded == true)
         {
-            Jcount = 1;
-            state = States.Idle;
+            velocity.y += Mathf.Sqrt(jumpHight * -2 * gravity);
         }
     }
     void PlayerWalk()
     {
-        anim.SetBool("walk", true);
+        if (isSprint == true)
+        {
+            state = States.Sprint;
+        }
+        anim.SetBool("Walk", true);
+        anim.SetBool("Running", false);
+        speed = 4;
         transform.Translate(moveInputValue.x * speed * Time.fixedDeltaTime, 0, moveInputValue.y * speed * Time.fixedDeltaTime);
         yRot += Input.GetAxis("Mouse X") * mouseSensitivity;
         transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, yRot, transform.localEulerAngles.z);
@@ -112,20 +143,59 @@ public class PlayerControles : MonoBehaviour
             state = States.Idle;
         }
     }
+    void PlayerSprint()
+    {
+        speed = 16;
+        if (isSprint == false)
+        {
+            state = States.Walk;
+        }
+        anim.SetBool("Running", true);
+        transform.Translate(moveInputValue.x * speed * Time.fixedDeltaTime, 0, moveInputValue.y * speed * Time.fixedDeltaTime);
+        yRot += Input.GetAxis("Mouse X") * mouseSensitivity;
+        transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, yRot, transform.localEulerAngles.z);
+        if (moveInputValue.x <= 0.1f && moveInputValue.y <= 0.1f)
+        {
+            state = States.Idle;
+        }
+
+    }
+    void PlayerFall()
+    {
+        anim.SetBool("Fall", true);
+        if (isGrounded == true)
+        {
+            anim.SetBool("Fall", false);
+            state = States.Idle;
+        }
+    
+    }
     int Jcount = 1;
     void OnJump()
     {
-        anim.SetBool("walk", false);
-        transform.Translate(moveInputValue.x * speed * Time.fixedDeltaTime, 0, moveInputValue.y * speed * Time.fixedDeltaTime);
-        // simulate jump
-        state = States.Jump;
-        Debug.Log("Pressed");
-        if (Jcount >= 0)
+        if (isGrounded == true)
         {
-
-            Jcount--;
-
+            state = States.Jump;
+            anim.SetBool("Jump", true);
         }
+    }
+    void OnSprint()
+    {
+        Sprint++;
+        if (Sprint == 0)
+        {
+            isSprint = false;
+        }
+        if (Sprint == 1)
+        {
+            isSprint = true;
+        }
+        else
+        {
+            Sprint = 0;
+            isSprint = false;
+        }
+        Debug.Log(Sprint);
     }
     void PlayerDeath()
     {
@@ -144,12 +214,6 @@ public class PlayerControles : MonoBehaviour
     }
     void OnCollisionEnter(Collision col)
     {
-        if (col.gameObject.tag == "Floor")
-        {
-            grounded = true;
-            print("landed!");
-        }
-
         if (col.gameObject.tag == "EvilCubeTheDestroyerOfWorlds")
         {
             state = States.Death;
