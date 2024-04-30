@@ -5,6 +5,7 @@ using Cinemachine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 
 public enum States
 {
@@ -27,31 +28,38 @@ public class PlayerControles : MonoBehaviour
     private float yRot;
     public float mouseSensitivity = 1f;
     private Animator anim;
-    private bool jump;
     States state;
     Vector3 velocity;
-    public float gravity = -0.81f;
-    public float jumpHight = 9f;
+    public float gravity = -9.81f;
+    public float jumpHight = 2f;
 
     public Transform groundCheck;
-    public float groundDistance = 0.4f;
+    public float groundDistance = 0.2f;
     public LayerMask groundMask;
     bool isGrounded;
 
     bool isSprint;
     int Sprint = 0;
+
+    public float turnSmooth = 0.1f;
+    float turnVelo;
+    public Transform cam;
+
     void Update()
     {
+
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         if (isGrounded && velocity.y < 0)
         {
-            velocity.y = -2;
+            velocity.y = -1;
         }
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
 
         DoLogic();
+
+        
     }
 
     void FixedUpdate()
@@ -114,6 +122,7 @@ public class PlayerControles : MonoBehaviour
 
     void PlayerJumping()
     {
+
         if (isGrounded == false)
         {
             anim.SetBool("Fall", true);
@@ -123,7 +132,7 @@ public class PlayerControles : MonoBehaviour
         // player is jumping, check for hitting the ground
         if (isGrounded == true)
         {
-            velocity.y += Mathf.Sqrt(jumpHight * -2 * gravity);
+            velocity.y += Mathf.Sqrt(jumpHight);
         }
     }
     void PlayerWalk()
@@ -135,10 +144,16 @@ public class PlayerControles : MonoBehaviour
         anim.SetBool("Walk", true);
         anim.SetBool("Running", false);
         speed = 4;
-        transform.Translate(moveInputValue.x * speed * Time.fixedDeltaTime, 0, moveInputValue.y * speed * Time.fixedDeltaTime);
-        yRot += Input.GetAxis("Mouse X") * mouseSensitivity;
-        transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, yRot, transform.localEulerAngles.z);
-        if (moveInputValue.x <= 0.1f && moveInputValue.y <= 0.1f)
+        float targitAngle = Mathf.Atan2(moveInputValue.x, moveInputValue.y) * Mathf.Rad2Deg + cam.eulerAngles.y;
+        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targitAngle, ref turnVelo, turnSmooth);
+        Vector3 direction = new Vector3(moveInputValue.x, 0f, moveInputValue.y).normalized;
+        Vector3 moveDire = Quaternion.Euler(0f, targitAngle, 0f) * Vector3.forward;
+        controller.Move(moveDire.normalized * speed * Time.deltaTime);
+        
+        transform.rotation = Quaternion.Euler(0, angle, 0);
+
+
+        if (moveInputValue.x == 0 && moveInputValue.y == 0)
         {
             state = States.Idle;
         }
@@ -151,13 +166,19 @@ public class PlayerControles : MonoBehaviour
             state = States.Walk;
         }
         anim.SetBool("Running", true);
-        transform.Translate(moveInputValue.x * speed * Time.fixedDeltaTime, 0, moveInputValue.y * speed * Time.fixedDeltaTime);
-        yRot += Input.GetAxis("Mouse X") * mouseSensitivity;
-        transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, yRot, transform.localEulerAngles.z);
-        if (moveInputValue.x <= 0.1f && moveInputValue.y <= 0.1f)
+        float targitAngle = Mathf.Atan2(moveInputValue.x, moveInputValue.y) * Mathf.Rad2Deg + cam.eulerAngles.y;
+        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targitAngle, ref turnVelo, turnSmooth);
+        Vector3 direction = new Vector3(moveInputValue.x, 0f, moveInputValue.y).normalized;
+        Vector3 moveDire = Quaternion.Euler(0f, targitAngle, 0f) * Vector3.forward;
+        controller.Move(moveDire.normalized * speed * Time.deltaTime);
+
+        transform.rotation = Quaternion.Euler(0, angle, 0);
+        if (moveInputValue.x == 0 && moveInputValue.y == 0)
         {
             state = States.Idle;
         }
+
+        
 
     }
     void PlayerFall()
@@ -170,9 +191,9 @@ public class PlayerControles : MonoBehaviour
         }
     
     }
-    int Jcount = 1;
     void OnJump()
     {
+        Debug.Log(isGrounded);
         if (isGrounded == true)
         {
             state = States.Jump;
@@ -214,6 +235,7 @@ public class PlayerControles : MonoBehaviour
     }
     void OnCollisionEnter(Collision col)
     {
+
         if (col.gameObject.tag == "EvilCubeTheDestroyerOfWorlds")
         {
             state = States.Death;
