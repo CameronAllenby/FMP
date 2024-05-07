@@ -2,15 +2,15 @@ using UnityEngine;
 using System;
 using UnityEngine.Audio;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance;
     public AudioSource musicSource,sfxSource,masterSource;
     public Sound[] musicSounds,sfxSounds,masterSounds;
     
-    
-
     public float MS = 1;
     private void Awake()
     {
@@ -86,9 +86,5 @@ public class AudioManager : MonoBehaviour
         masterSource.volume = volume;
         sfxSource.volume = volume;
         musicSource.volume = volume;
-    }
-    private void Update()
-    {
-        
     }
 }

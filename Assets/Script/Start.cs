@@ -6,13 +6,6 @@ using UnityEngine.UI;
 
 public class Leavegame : MonoBehaviour
 {
-    public string sceneName;
-    
-    public void ChangeScene()
-    {
-        print("loading scene " + sceneName);
-        SceneManager.LoadScene(sceneName);
-    }
 
     public void QuitGame()
     {
@@ -26,5 +19,10 @@ public class Leavegame : MonoBehaviour
     public void PlayGame()
     {
         SceneManager.LoadScene(1);
+    }
+
+    public void Back2Menu()
+    {
+        SceneManager.LoadScene(0);
     }
 }
