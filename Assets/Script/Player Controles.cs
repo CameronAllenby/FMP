@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine.Experimental.GlobalIllumination;
 
 public enum States
 {
@@ -17,11 +18,15 @@ public enum States
     Glide,
     Aim,
     Sprint,
-    Fall,
+    Fall, 
+    AimWalk,
 }
 public class PlayerControles : MonoBehaviour
 {
+    [SerializeField] private LayerMask aimCollider = new LayerMask();
+    [SerializeField] private CinemachineVirtualCamera AimCam;
     [SerializeField] private float speed;
+    [SerializeField] private Transform debugtansform;
     public CharacterController controller;
     private Vector2 moveInputValue;
     private Vector2 cameraInputValue;
@@ -30,7 +35,7 @@ public class PlayerControles : MonoBehaviour
     private Animator anim;
     States state;
     Vector3 velocity;
-    public float gravity = -9.81f;
+    public float gravity = -25f;
     public float jumpHight = 2f;
 
     public Transform groundCheck;
@@ -44,7 +49,11 @@ public class PlayerControles : MonoBehaviour
     public float turnSmooth = 0.1f;
     float turnVelo;
     public Transform cam;
-
+    public Transform cam2;
+    Transform hitTransform = null;
+    bool Aiming;
+    bool isAiming;
+    [SerializeField] private GameObject _Camera;
     void Update()
     {
 
@@ -59,12 +68,19 @@ public class PlayerControles : MonoBehaviour
 
         DoLogic();
 
+        Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
+        Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
+        if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, aimCollider))
+        {
+            debugtansform.position = raycastHit.point;  
+        }
+        hitTransform = raycastHit.transform;
         
     }
 
     void FixedUpdate()
     {
- 
+
     }
 
     private void Start()
@@ -103,6 +119,11 @@ public class PlayerControles : MonoBehaviour
         {
             PlayerFall();
         }
+
+        if (state == States.AimWalk)
+        {
+            PlayerAimWalking();
+        }
     }
 
     void PlayerIdle()
@@ -114,12 +135,48 @@ public class PlayerControles : MonoBehaviour
         anim.SetBool("Running", false);
         anim.SetBool("Walk", false);
 
-        if (moveInputValue.x != 0f || moveInputValue.y != 0f)
+        if ((moveInputValue.x != 0f || moveInputValue.y != 0f) && Aiming == false)
         {
             state = States.Walk;
         }
-    }
 
+        if ((moveInputValue.x != 0f || moveInputValue.y != 0f) && Aiming == true)
+        {
+            state = States.AimWalk;
+        }
+
+        aiming();
+    }
+    void PlayerAimWalking()
+    {
+        anim.SetBool("Walk", false);
+        anim.SetBool("Running", false);
+        speed = 6;
+        float targitAngle = Mathf.Atan2(moveInputValue.x, moveInputValue.y) + cam.eulerAngles.y;
+
+        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targitAngle, ref turnVelo, turnSmooth);
+
+        Vector3 direction = new Vector3(moveInputValue.x, 0f, moveInputValue.y).normalized;
+
+        Vector3 moveDire = Quaternion.Euler(0f, targitAngle, 0f) * Vector3.forward;
+
+        Vector3 move = new Vector3(moveInputValue.x, 0, moveInputValue.y);
+
+        move = move.x * cam2.right.normalized + move.y * cam2.forward.normalized;
+        move.y = 0f;
+
+        controller.Move(move.normalized * speed * Time.deltaTime);
+
+        transform.rotation = Quaternion.Euler(0, targitAngle, 0);
+
+       
+
+        if (moveInputValue.x == 0 && moveInputValue.y == 0)
+        {
+            state = States.Idle;
+        }
+        aiming();
+    }
     void PlayerJumping()
     {
 
@@ -143,7 +200,7 @@ public class PlayerControles : MonoBehaviour
         }
         anim.SetBool("Walk", true);
         anim.SetBool("Running", false);
-        speed = 4;
+        speed = 6;
         float targitAngle = Mathf.Atan2(moveInputValue.x, moveInputValue.y) * Mathf.Rad2Deg + cam.eulerAngles.y;
         float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targitAngle, ref turnVelo, turnSmooth);
         Vector3 direction = new Vector3(moveInputValue.x, 0f, moveInputValue.y).normalized;
@@ -152,6 +209,7 @@ public class PlayerControles : MonoBehaviour
         
         transform.rotation = Quaternion.Euler(0, angle, 0);
 
+        aiming();
 
         if (moveInputValue.x == 0 && moveInputValue.y == 0)
         {
@@ -178,7 +236,7 @@ public class PlayerControles : MonoBehaviour
             state = States.Idle;
         }
 
-        
+        aiming();
 
     }
     void PlayerFall()
@@ -189,7 +247,15 @@ public class PlayerControles : MonoBehaviour
             anim.SetBool("Fall", false);
             state = States.Idle;
         }
-    
+        speed = 2;
+        float targitAngle = Mathf.Atan2(moveInputValue.x, moveInputValue.y) * Mathf.Rad2Deg + cam.eulerAngles.y;
+        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targitAngle, ref turnVelo, turnSmooth);
+        Vector3 direction = new Vector3(moveInputValue.x, 0f, moveInputValue.y).normalized;
+        Vector3 moveDire = Quaternion.Euler(0f, targitAngle, 0f) * Vector3.forward;
+        controller.Move(moveDire.normalized * speed * Time.deltaTime);
+
+        transform.rotation = Quaternion.Euler(0, angle, 0);
+
     }
     void OnJump()
     {
@@ -218,11 +284,50 @@ public class PlayerControles : MonoBehaviour
         }
         Debug.Log(Sprint);
     }
+    void OnAim()
+    {
+       
+        if (Aiming == false)
+        {
+            Aiming = true;
+        }
+        else
+        {
+            Aiming = false;
+        }
+    }
     void PlayerDeath()
     {
 
     }
+    void OnShoot()
+    {
+        if (hitTransform != null)
+        {
+            //if ()
+        }
+    }
+    void aiming()
+    {
+        if (Aiming == true)
+        {
+            anim.SetBool("Aim", true);
+            AimCam.gameObject.SetActive(true);
+            float targitAngle = Mathf.Atan2(moveInputValue.x, moveInputValue.y) * Mathf.Rad2Deg + cam.eulerAngles.y;
+            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targitAngle, ref turnVelo, turnSmooth);
+            Vector3 direction = new Vector3(moveInputValue.x, 0f, moveInputValue.y).normalized;
+            Vector3 moveDire = Quaternion.Euler(0f, targitAngle, 0f) * Vector3.forward;
 
+
+            transform.rotation = Quaternion.Euler(0, angle, 0);
+
+        }
+        else
+        {
+            anim.SetBool("Aim", false);
+            AimCam.gameObject.SetActive(false);
+        }
+    }
     private void OnNewaction(InputValue value)
     {
         moveInputValue = value.Get<Vector2>();
@@ -231,7 +336,7 @@ public class PlayerControles : MonoBehaviour
     private void OnCamera(InputValue value)
     {
         cameraInputValue = value.Get<Vector2>();
-        Debug.Log(cameraInputValue);
+        Debug.Log(cameraInputValue + "p");
     }
     void OnCollisionEnter(Collision col)
     {
