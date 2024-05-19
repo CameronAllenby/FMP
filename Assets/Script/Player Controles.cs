@@ -162,7 +162,7 @@ public class PlayerControles : MonoBehaviour
 
         Vector3 move = new Vector3(moveInputValue.x, 0, moveInputValue.y);
 
-        move = move.x * cam2.right.normalized + move.y * cam2.forward.normalized;
+        move = move.x * cam2.right.normalized + move.z * cam2.forward.normalized;
         move.y = 0f;
 
         controller.Move(move.normalized * speed * Time.deltaTime);

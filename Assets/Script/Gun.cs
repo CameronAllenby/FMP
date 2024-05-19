@@ -1,8 +1,13 @@
 
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.XR;
+
 
 public class Gun : MonoBehaviour
 {
+    public CharacterController controller;
+    
     public int damage;
     public float timeBetweenShooting, spread, range, reloadTime, timeBetweenShots;
     public int magazineSize, bulletsPerTap;
