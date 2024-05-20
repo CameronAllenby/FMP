@@ -14,6 +14,8 @@ public class enemy : MonoBehaviour
 
     public float health;
 
+    private Animator anim;
+
     //Patroling
     public Vector3 walkPoint;
     bool walkPointSet;
@@ -51,6 +53,10 @@ public class enemy : MonoBehaviour
         {
             AttackPlayer();
         }
+        if (health <= 0)
+        {
+            Destroy(gameObject);
+        }
     }
     private void Patroling()
     {
@@ -58,24 +64,24 @@ public class enemy : MonoBehaviour
         {
             agent.SetDestination(walkPoint);
         }
-
         Vector3 distanceToWalkPoint = transform.position - walkPoint;
 
         if (distanceToWalkPoint.magnitude < 1)
         {
-            walkPointSet = false;
+            walkPointSet = true;
         }
     }
     private void SearchWalkPoint()
     {
         float randomZ = Random.Range(-walkPointRange, walkPointRange);
         float randomX = Random.Range(-walkPointRange, walkPointRange);
+ 
 
         walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
         
         if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround))
         {
-            walkPointSet = true;
+            walkPointSet = false;
         }
     }
     private void ChasePlayer()
@@ -85,7 +91,10 @@ public class enemy : MonoBehaviour
 
     private void AttackPlayer()
     {
+        anim.SetBool("Attack", true);
+
         //Attack code goes here
+
 
         agent.SetDestination(transform.position);
 
@@ -95,11 +104,13 @@ public class enemy : MonoBehaviour
         {
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
+
         }
     }
     private void ResetAttack()
     {
         alreadyAttacked = false;
+        anim.SetBool("Attack", false);
     }
 
     public void TakeDamage(int damage)
@@ -114,6 +125,14 @@ public class enemy : MonoBehaviour
     private void DestroyEnemy()
     {
         Destroy(gameObject);
+    }
+
+    private void OnTriggerEnter(Collider col)
+    {
+        if (col.gameObject.tag == "Bullet")
+        {
+            health--;
+        }
     }
 
     private void OnDrawGizmosSelected()

@@ -2,17 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : MonoBehaviour
+public class Bullet : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private Rigidbody rb;
+
+    private void Awake()
     {
-        
+        rb = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        
+        float speed = 100f;
+        rb.velocity = transform.forward * speed;
+    }
+
+    private void OnTriggerExit(Collider collision)
+    {
+        Destroy(gameObject);
     }
 }

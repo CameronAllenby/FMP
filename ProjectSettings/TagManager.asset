@@ -5,14 +5,15 @@ TagManager:
   serializedVersion: 2
   tags:
   - Floor
+  - Bullet
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Ground
+  - whatIsGround
   - Water
   - UI
-  - Player
+  - whatIsPlayer
   - 
   - 
   - 

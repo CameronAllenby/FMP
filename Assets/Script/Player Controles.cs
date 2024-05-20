@@ -39,6 +39,8 @@ public class PlayerControles : MonoBehaviour
     public float jumpHight = 2f;
 
     public Transform groundCheck;
+    [SerializeField] private Transform pfBullet;
+    [SerializeField] private Transform bulletPosition;
     public float groundDistance = 0.2f;
     public LayerMask groundMask;
     bool isGrounded;
@@ -56,7 +58,7 @@ public class PlayerControles : MonoBehaviour
     [SerializeField] private GameObject _Camera;
     void Update()
     {
-
+        Vector3 worldMouse = Vector3.zero;
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         if (isGrounded && velocity.y < 0)
@@ -72,7 +74,8 @@ public class PlayerControles : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
         if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, aimCollider))
         {
-            debugtansform.position = raycastHit.point;  
+            debugtansform.position = raycastHit.point; 
+            worldMouse = raycastHit.point;
         }
         hitTransform = raycastHit.transform;
         
@@ -302,10 +305,17 @@ public class PlayerControles : MonoBehaviour
     }
     void OnShoot()
     {
-        if (hitTransform != null)
+        Vector3 worldMouse = Vector3.zero;
+        Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
+        Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
+        if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, aimCollider))
         {
-            //if ()
+            debugtansform.position = raycastHit.point;
+            worldMouse = raycastHit.point;
         }
+        hitTransform = raycastHit.transform;
+        Vector3 aimDir = (worldMouse - bulletPosition.position).normalized;
+        Instantiate(pfBullet, bulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
     }
     void aiming()
     {
