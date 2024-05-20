@@ -38,6 +38,7 @@ public class PlayerControles : MonoBehaviour
     public float gravity = -25f;
     public float jumpHight = 2f;
 
+    public float health = 10;
     public Transform groundCheck;
     [SerializeField] private Transform pfBullet;
     [SerializeField] private Transform bulletPosition;
@@ -58,6 +59,10 @@ public class PlayerControles : MonoBehaviour
     [SerializeField] private GameObject _Camera;
     void Update()
     {
+        if (health <= 0)
+        {
+            Destroy(gameObject);
+        }
         Vector3 worldMouse = Vector3.zero;
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
@@ -155,13 +160,13 @@ public class PlayerControles : MonoBehaviour
         anim.SetBool("Walk", false);
         anim.SetBool("Running", false);
         speed = 6;
-        float targitAngle = Mathf.Atan2(moveInputValue.x, moveInputValue.y) + cam.eulerAngles.y;
+        float targitAngle = Mathf.Atan2(moveInputValue.x, moveInputValue.y) + cam2.eulerAngles.y;
 
         float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targitAngle, ref turnVelo, turnSmooth);
 
-        Vector3 direction = new Vector3(moveInputValue.x, 0f, moveInputValue.y).normalized;
+        //Vector3 direction = new Vector3(moveInputValue.x, 0f, moveInputValue.y).normalized;
 
-        Vector3 moveDire = Quaternion.Euler(0f, targitAngle, 0f) * Vector3.forward;
+        //Vector3 moveDire = Quaternion.Euler(0f, targitAngle, 0f) * Vector3.forward;
 
         Vector3 move = new Vector3(moveInputValue.x, 0, moveInputValue.y);
 
@@ -301,7 +306,7 @@ public class PlayerControles : MonoBehaviour
     }
     void PlayerDeath()
     {
-
+        Destroy(gameObject);
     }
     void OnShoot()
     {
@@ -348,12 +353,12 @@ public class PlayerControles : MonoBehaviour
         cameraInputValue = value.Get<Vector2>();
         Debug.Log(cameraInputValue + "p");
     }
-    void OnCollisionEnter(Collision col)
+    void OnTriggerEnter(Collider col)
     {
 
-        if (col.gameObject.tag == "EvilCubeTheDestroyerOfWorlds")
+        if (col.gameObject.tag == "bad")
         {
-            state = States.Death;
+            health--;
         }
     }
     private void OnGUI()

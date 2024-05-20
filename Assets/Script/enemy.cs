@@ -32,6 +32,7 @@ public class enemy : MonoBehaviour
     private void Awake()
     {
         player = GameObject.Find("Player").transform;
+        anim = GetComponent<Animator>();
     }
 
     private void Update()
@@ -52,6 +53,7 @@ public class enemy : MonoBehaviour
         if (playerInSightRange && playerInAttackRange)
         {
             AttackPlayer();
+            anim.SetBool("Attack", true);
         }
         if (health <= 0)
         {
@@ -92,7 +94,7 @@ public class enemy : MonoBehaviour
     private void AttackPlayer()
     {
         anim.SetBool("Attack", true);
-
+        
         //Attack code goes here
 
 

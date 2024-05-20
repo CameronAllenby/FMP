@@ -64,10 +64,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Zombie Idle
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: cf7b7af2fbdc00944a9a37bac1c94c05, type: 3}
+      propertyPath: m_TagString
+      value: bad
+      objectReference: {fileID: 0}
     - target: {fileID: 2106145266610383287, guid: cf7b7af2fbdc00944a9a37bac1c94c05, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 8d1f536c72b93074d8cbe2902d359f7e, type: 2}
+    - target: {fileID: 5323162407277330719, guid: cf7b7af2fbdc00944a9a37bac1c94c05, type: 3}
+      propertyPath: m_TagString
+      value: bad
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -99,8 +107,8 @@ NavMeshAgent:
   m_GameObject: {fileID: 4388070601063419713}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 75
+  m_Radius: 0.03
+  m_Speed: 6
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -108,7 +116,7 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 2
+  m_Height: 0.51
   m_BaseOffset: 0
   m_WalkableMask: 5
   m_ObstacleAvoidanceType: 4
@@ -125,19 +133,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 5177118530787924698}
-  player: {fileID: 0}
+  player: {fileID: 5036882367934922037}
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
   whatIsPlayer:
     serializedVersion: 2
     m_Bits: 64
-  health: 10
+  health: 30
   walkPoint: {x: 0, y: 0, z: 0}
   walkPointRange: 10.56
   timeBetweenAttacks: 4
-  sightRange: 45.1
-  attackRange: 10
+  sightRange: 78.9
+  attackRange: 4.1
   playerInSightRange: 0
   playerInAttackRange: 0
 --- !u!95 &4258241298384232533
@@ -185,3 +193,8 @@ CapsuleCollider:
   m_Height: 0.08307423
   m_Direction: 1
   m_Center: {x: 0.0056533813, y: 0.04678421, z: 0.006938171}
+--- !u!4 &5036882367934922037 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8485484235053141797, guid: cf7b7af2fbdc00944a9a37bac1c94c05, type: 3}
+  m_PrefabInstance: {fileID: 3469151770183561744}
+  m_PrefabAsset: {fileID: 0}
