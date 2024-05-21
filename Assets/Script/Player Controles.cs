@@ -38,7 +38,9 @@ public class PlayerControles : MonoBehaviour
     public float gravity = -25f;
     public float jumpHight = 2f;
 
-    public float health = 10;
+    public int health = 10;
+    public int currentHealth;
+
     public Transform groundCheck;
     [SerializeField] private Transform pfBullet;
     [SerializeField] private Transform bulletPosition;
@@ -57,9 +59,11 @@ public class PlayerControles : MonoBehaviour
     bool Aiming;
     bool isAiming;
     [SerializeField] private GameObject _Camera;
+
+    public healthbar HealthBar;
     void Update()
     {
-        if (health <= 0)
+        if (currentHealth <= 0)
         {
             Destroy(gameObject);
         }
@@ -95,6 +99,8 @@ public class PlayerControles : MonoBehaviour
     {
         anim = GetComponent<Animator>();
         state = States.Idle;
+        currentHealth = health;
+        HealthBar.SetMaxHealth(health);
     }
     void DoLogic()
     {
@@ -358,7 +364,8 @@ public class PlayerControles : MonoBehaviour
 
         if (col.gameObject.tag == "bad")
         {
-            health--;
+            currentHealth--;
+            HealthBar.SetHealth(currentHealth);
         }
     }
     private void OnGUI()
