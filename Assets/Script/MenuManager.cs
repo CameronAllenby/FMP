@@ -50,15 +50,13 @@ public class MenuManager : MonoBehaviour
     private void OpenMenu()
     {
         _mainMenuCanvasGO.SetActive(true);
-        _SettingsMenuCanvasGO.SetActive(false);
+ 
 
         EventSystem.current.SetSelectedGameObject(_mainMenuFirst);
     }
     private void CloseAllMenu()
     {
         _mainMenuCanvasGO.SetActive(false);
-        _SettingsMenuCanvasGO.SetActive(false);
 
-        EventSystem.current.SetSelectedGameObject(_settingsMenuFirst);
     }
 }

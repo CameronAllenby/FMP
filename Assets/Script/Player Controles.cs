@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
 using Unity.VisualScripting;
 using UnityEngine.Experimental.GlobalIllumination;
+using UnityEngine.EventSystems;
 
 public enum States
 {
@@ -22,6 +23,9 @@ public enum States
 }
 public class PlayerControles : MonoBehaviour
 {
+    [SerializeField] private GameObject _deathScreen;
+    [SerializeField] private GameObject _deathExit;
+
     [SerializeField] private LayerMask aimCollider = new LayerMask();
     [SerializeField] private CinemachineVirtualCamera AimCam;
     [SerializeField] private float speed;
@@ -62,8 +66,11 @@ public class PlayerControles : MonoBehaviour
     public healthbar HealthBar;
     void Update()
     {
+        
         if (currentHealth <= 0)
         {
+            _deathScreen.SetActive(true);
+            EventSystem.current.SetSelectedGameObject(_deathExit);
             Destroy(gameObject);
         }
         Vector3 worldMouse = Vector3.zero;
@@ -100,6 +107,7 @@ public class PlayerControles : MonoBehaviour
         state = States.Idle;
         currentHealth = health;
         HealthBar.SetMaxHealth(health);
+        _deathScreen.SetActive(false);
     }
     void DoLogic()
     {
@@ -120,6 +128,7 @@ public class PlayerControles : MonoBehaviour
 
         if (state == States.Death)
         {
+
             PlayerDeath();
         }
 
@@ -377,4 +386,5 @@ public class PlayerControles : MonoBehaviour
         GUILayout.Label($"<size=16>{text}</size>");
         GUILayout.EndArea();
     }
+
 }
