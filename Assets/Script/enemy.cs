@@ -12,7 +12,7 @@ public class enemy : MonoBehaviour
 
     public LayerMask whatIsGround, whatIsPlayer;
 
-    public float health;
+    public float health = 30;
 
     private Animator anim;
 
@@ -65,6 +65,7 @@ public class enemy : MonoBehaviour
         if (!walkPointSet) SearchWalkPoint();
         {
             agent.SetDestination(walkPoint);
+            anim.SetBool("idle", true);
         }
         Vector3 distanceToWalkPoint = transform.position - walkPoint;
 
@@ -88,6 +89,7 @@ public class enemy : MonoBehaviour
     }
     private void ChasePlayer()
     {
+        anim.SetBool("idle", false);
         agent.SetDestination(player.position);
     }
 

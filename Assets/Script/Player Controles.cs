@@ -64,6 +64,7 @@ public class PlayerControles : MonoBehaviour
     [SerializeField] private GameObject _Camera;
 
     public healthbar HealthBar;
+    AudioManager audioManager;
     void Update()
     {
         
@@ -103,6 +104,8 @@ public class PlayerControles : MonoBehaviour
 
     private void Start()
     {
+        audioManager = GameObject.FindWithTag("Audio").GetComponent<AudioManager>();
+        Time.timeScale = 1;
         anim = GetComponent<Animator>();
         state = States.Idle;
         currentHealth = health;
@@ -197,6 +200,10 @@ public class PlayerControles : MonoBehaviour
         {
             state = States.Idle;
         }
+        if ((moveInputValue.x != 0f || moveInputValue.y != 0f) && Aiming == false)
+        {
+            state = States.Walk;
+        }
         aiming();
     }
     void PlayerJumping()
@@ -208,6 +215,15 @@ public class PlayerControles : MonoBehaviour
             anim.SetBool("Jump", false);
             state = States.Fall;
         }
+        speed = 4;
+        float targitAngle = Mathf.Atan2(moveInputValue.x, moveInputValue.y) * Mathf.Rad2Deg + cam.eulerAngles.y;
+        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targitAngle, ref turnVelo, turnSmooth);
+        Vector3 direction = new Vector3(moveInputValue.x, 0f, moveInputValue.y).normalized;
+        Vector3 moveDire = Quaternion.Euler(0f, targitAngle, 0f) * Vector3.forward;
+        controller.Move(moveDire.normalized * speed * Time.deltaTime);
+
+        
+        transform.rotation = Quaternion.Euler(0, angle, 0);
         // player is jumping, check for hitting the ground
         if (isGrounded == true)
         {
@@ -233,6 +249,11 @@ public class PlayerControles : MonoBehaviour
 
         aiming();
 
+        if ((moveInputValue.x != 0f || moveInputValue.y != 0f) && Aiming == true)
+        {
+            state = States.AimWalk;
+        }
+
         if (moveInputValue.x == 0 && moveInputValue.y == 0)
         {
             state = States.Idle;
@@ -244,6 +265,11 @@ public class PlayerControles : MonoBehaviour
         if (isSprint == false)
         {
             state = States.Walk;
+        }
+
+        if ((moveInputValue.x != 0f || moveInputValue.y != 0f) && Aiming == true)
+        {
+            state = States.AimWalk;
         }
         anim.SetBool("Running", true);
         float targitAngle = Mathf.Atan2(moveInputValue.x, moveInputValue.y) * Mathf.Rad2Deg + cam.eulerAngles.y;
@@ -269,7 +295,7 @@ public class PlayerControles : MonoBehaviour
             anim.SetBool("Fall", false);
             state = States.Idle;
         }
-        speed = 2;
+        speed = 4;
         float targitAngle = Mathf.Atan2(moveInputValue.x, moveInputValue.y) * Mathf.Rad2Deg + cam.eulerAngles.y;
         float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targitAngle, ref turnVelo, turnSmooth);
         Vector3 direction = new Vector3(moveInputValue.x, 0f, moveInputValue.y).normalized;
@@ -277,7 +303,7 @@ public class PlayerControles : MonoBehaviour
         controller.Move(moveDire.normalized * speed * Time.deltaTime);
 
         transform.rotation = Quaternion.Euler(0, angle, 0);
-
+        aiming();
     }
     void OnJump()
     {
@@ -324,6 +350,7 @@ public class PlayerControles : MonoBehaviour
     }
     void OnShoot()
     {
+
         Vector3 worldMouse = Vector3.zero;
         Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
         Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
@@ -334,14 +361,20 @@ public class PlayerControles : MonoBehaviour
         }
         hitTransform = raycastHit.transform;
         Vector3 aimDir = (worldMouse - bulletPosition.position).normalized;
-        Instantiate(pfBullet, bulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
+        if (Aiming == true)
+        {
+            Instantiate(pfBullet, bulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
+            audioManager.PlaySFX("Gun");
+        }
     }
     void aiming()
     {
         if (Aiming == true)
         {
             anim.SetBool("Aim", true);
-            AimCam.gameObject.SetActive(true);
+            AimCam.m_Priority = 30;
+                //gameObject.SetActive(true);
+
             float targitAngle = Mathf.Atan2(moveInputValue.x, moveInputValue.y) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targitAngle, ref turnVelo, turnSmooth);
             Vector3 direction = new Vector3(moveInputValue.x, 0f, moveInputValue.y).normalized;
@@ -353,8 +386,9 @@ public class PlayerControles : MonoBehaviour
         }
         else
         {
+            AimCam.m_Priority = 1;
             anim.SetBool("Aim", false);
-            AimCam.gameObject.SetActive(false);
+           
         }
     }
     private void OnNewaction(InputValue value)
@@ -376,7 +410,7 @@ public class PlayerControles : MonoBehaviour
             HealthBar.SetHealth(currentHealth);
         }
     }
-    private void OnGUI()
+    /*private void OnGUI()
     {
         //debug text
         string text = "Current state=" + state;
@@ -385,6 +419,6 @@ public class PlayerControles : MonoBehaviour
         GUILayout.BeginArea(new Rect(10f, 450f, 1600f, 1600f));
         GUILayout.Label($"<size=16>{text}</size>");
         GUILayout.EndArea();
-    }
+    }*/
 
 }
